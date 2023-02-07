@@ -38,6 +38,19 @@ Public instance methods: save(), to_dict()
 	self.updated_at = datetime.now()
         storage.save()
         return 0
+    
     def to_dict(self):
-        return 0
+        """ returns a dictionary containing all keys/values of __dict__ of the instance object
+            - only instance attributes set will be returned
+            - a key __class__ is added with the class name of the object
+            - created_at and updated_at must be converted to string object in ISO format object
+		
+	* Running the __dict__ method on the object helps understand this task * 
+        """
+        obj_dict = self.__dict__.copy()
+        obj_dict.__class__ = self.__class__.__name__
+        
+        for key, value in self.__dict__.items():
+            if key in ("created_at", "updated_at"):
+                obj_dict = self.__dict__[key].isoformat()
         return 0

@@ -33,3 +33,14 @@ class FileStorage:
             for key, value in self.__objects.items():
                 py_dict[key] = value.to_dict()
             json.dump(py_dict, f)
+
+    def reload(self):
+        """ deserializes the JSON file to __objects (only if the JSON file (__file_path) exists ;
+        otherwise, do nothing. If the file doesn't exist, no exception should be raised)
+        """
+        try:
+            with open(self.__file_path, encoding = "utf-8") as f:
+                for objects in json.load(f).values():
+                    self.new(eval(objects["__class__"])(**objects)
+        except FileNotFoundError:
+            return

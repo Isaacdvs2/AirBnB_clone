@@ -47,9 +47,10 @@ class FileStorage:
         """ deserializes the JSON file to __objects (only if the JSON file (__file_path) exists ;
         otherwise, do nothing. If the file doesn't exist, no exception should be raised)
         """
-        try:
-            with open(self.__file_path, encoding = "utf-8") as f:
-                for objects in json.load(f).values():
-                    self.new(eval(objects["__class__"])(**objects)
-        except FileNotFoundError:
+        if not os.path.isfile(FileStorage.__file_path):
             return
+        with open(FileStorage.__file_path, "r", encoding="utf-8") as f:
+            obj_dict = json.load(f)
+            obj_dict = {k: self.classes()[v["__class__"]](**v)
+                        for k, v in obj_dict.items()}
+            FileStorage.__objects = obj_dict

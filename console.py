@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-
+"""contains the entry point of the command interpreter"""
 import cmd
 import re
 from shlex import split
@@ -13,7 +13,7 @@ from models.place import Place
 from models.state import State
 from models.review import Review
 
-
+# A global constant since both functions within and outside uses it.
 CLASSES = [
     "BaseModel",
     "User",
@@ -24,7 +24,6 @@ CLASSES = [
     "Review"
 ]
 
-""" The console program for the project """
 
 def parse(arg):
     curly_braces = re.search(r"\{(.*?)\}", arg)
@@ -42,6 +41,7 @@ def parse(arg):
         retl = [i.strip(",") for i in lexer]
         retl.append(curly_braces.group())
         return retl
+
 
 def check_args(args):
     """checks if args is valid
@@ -61,27 +61,54 @@ def check_args(args):
     else:
         return arg_list
 
+
 class HBNBCommand(cmd.Cmd):
-
+    """The class that implements the console
+    for the AirBnB clone web application
     """
-    the class that implements the console for the project
-    """
-
-    prompt = "(hbnb)"
+    prompt = "(hbnb) "
     storage = models.storage
 
-    def do_quit(self, argv):
-        """ handles the functionality to exit a program """
-        return True
+    def emptyline(self):
+        """Command to executed when empty line + <ENTER> key"""
+        pass
+
+    def default(self, arg):
+        """Default behaviour for cmd module when input is invalid"""
+        action_map = {
+            "all": self.do_all,
+            "show": self.do_show,
+            "destroy": self.do_destroy,
+            "count": self.do_count,
+            "update": self.do_update,
+            "create": self.do_create
+        }
+
+        match = re.search(r"\.", arg)
+        if match:
+            arg1 = [arg[:match.span()[0]], arg[match.span()[1]:]]
+            match = re.search(r"\((.*?)\)", arg1[1])
+            if match:
+                command = [arg1[1][:match.span()[0]], match.group()[1:-1]]
+                if command[0] in action_map:
+                    call = "{} {}".format(arg1[0], command[1])
+                    return action_map[command[0]](call)
+
+        print("*** Unknown syntax: {}".format(arg))
+        return False
 
     def do_EOF(self, argv):
-        """ handles exiting of the program when EOF signal is recieved """
+        """EOF signal to exit the program"""
         print("")
         return True
 
+    def do_quit(self, argv):
+        """When executed, exits the console."""
+        return True
+
     def do_create(self, argv):
-        """ Creates a new instance of BaseModel, saves it (to the JSON file)
-         and prints the id"""
+        """Creates a new instance of BaseModel, saves it (to a JSON file)
+        and prints the id"""
         args = check_args(argv)
         if args:
             print(eval(args[0])().id)
@@ -154,6 +181,16 @@ class HBNBCommand(cmd.Cmd):
                     print("** no instance found **")
 
             self.storage.save()
+
+    def do_count(self, arg):
+        """Retrieve the number of instances of a class"""
+        arg1 = parse(arg)
+        count = 0
+        for obj in models.storage.all().values():
+            if arg1[0] == type(obj).__name__:
+                count += 1
+        print(count)
+
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()

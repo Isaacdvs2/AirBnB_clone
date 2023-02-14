@@ -5,6 +5,7 @@ Contains the FileStorage class model
 
 """
 import json
+import os
 
 from models.base_model import BaseModel
 from models.user import User
@@ -47,13 +48,11 @@ class FileStorage:
             json.dump(dict_storage, f)
 
     def reload(self):
-        """
-        Deserializes the JSON file to __objects
-        -> Only IF it exists!
-        """
-        try:
-            with open(self.__file_path, encoding="utf-8") as f:
-                for obj in json.load(f).values():
-                    self.new(eval(obj["__class__"])(**obj))
-        except FileNotFoundError:
+        """Reloads the stored objects"""
+        if not os.path.isfile(FileStorage.__file_path):
             return
+        with open(FileStorage.__file_path, "r", encoding="utf-8") as f:
+            obj_dict = json.load(f)
+            obj_dict = {k: self.classes()[v["__class__"]](**v)
+                        for k, v in obj_dict.items()}
+            FileStorage.__objects = obj_dict

@@ -15,15 +15,12 @@ The AirBnB project is a clone of the original AirBnB website (https://intranet.a
 	<br>and debugging.
 <hr>
 ## Part 2: The Website.
-
-## To be Updated.
+	To be Updated.
 <hr>
 ## Part 3: The Database.
-
-## To be Updated.
+	To be Updated.
 <hr>
 ## Part 4: An API.
-
-## To be Updated
+	To be Updated
 <hr>
 
